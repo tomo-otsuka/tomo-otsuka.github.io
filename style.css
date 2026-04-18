@@ -5,8 +5,8 @@
     --bg-color: #06060e;
     --bg-surface: #0c0c1a;
     --text-primary: #f0f0f5;
-    --text-secondary: #8888a4;
-    --text-muted: #555570;
+    --text-secondary: #9999b8;
+    --text-muted: #666688;
     --accent-1: #6c5ce7;
     --accent-2: #a55eea;
     --accent-3: #00d2ff;
@@ -122,6 +122,38 @@ button:focus-visible {
     pointer-events: none;
     mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
     -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 20%, transparent 70%);
+}
+
+/* ──────────────────────────────────────────────
+   Scroll Progress
+   ────────────────────────────────────────────── */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--gradient-primary);
+    z-index: 10000;
+    transition: width 0.1s linear;
+    pointer-events: none;
+}
+
+/* ──────────────────────────────────────────────
+   Noise Texture Overlay
+   ────────────────────────────────────────────── */
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
 }
 
 /* ──────────────────────────────────────────────
@@ -252,8 +284,85 @@ button:focus-visible {
     z-index: 1;
 }
 
+.hero-visual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 500px;
+    height: 500px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.hero-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid transparent;
+}
+
+.hero-ring-1 {
+    inset: 0;
+    border-color: rgba(108, 92, 231, 0.12);
+    animation: rotate-slow 30s linear infinite;
+}
+
+.hero-ring-2 {
+    inset: 40px;
+    border-color: rgba(165, 94, 234, 0.08);
+    animation: rotate-slow 25s linear infinite reverse;
+}
+
+.hero-ring-3 {
+    inset: 80px;
+    border-color: rgba(0, 210, 255, 0.06);
+    animation: rotate-slow 20s linear infinite;
+}
+
+.hero-ring::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--accent-1);
+    border-radius: 50%;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+}
+
+.hero-ring-2::before {
+    background: var(--accent-2);
+    box-shadow: 0 0 10px rgba(165, 94, 234, 0.5);
+    left: auto;
+    right: 0;
+}
+
+.hero-ring-3::before {
+    background: var(--accent-3);
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hero-glow {
+    position: absolute;
+    inset: 120px;
+    background: radial-gradient(circle, rgba(108, 92, 231, 0.08), transparent 70%);
+    border-radius: 50%;
+}
+
+@keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 .hero-content {
     max-width: 800px;
+    position: relative;
+    z-index: 1;
 }
 
 .hero-badge {
@@ -465,6 +574,27 @@ button:focus-visible {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
+    position: relative;
+}
+
+.section-number {
+    font-family: var(--font-mono);
+    font-size: clamp(5rem, 10vw, 8rem);
+    font-weight: 800;
+    color: rgba(108, 92, 231, 0.06);
+    line-height: 1;
+    position: absolute;
+    top: -1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+}
+
+.section-title > *:not(.section-number) {
+    position: relative;
+    z-index: 1;
 }
 
 .section-label {
@@ -473,6 +603,18 @@ button:focus-visible {
     font-weight: 500;
     color: var(--accent-1);
     letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.section-label::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gradient-primary);
+    opacity: 0.5;
 }
 
 /* ──────────────────────────────────────────────
@@ -585,12 +727,31 @@ button:focus-visible {
 
 .project-card:hover {
     transform: translateY(-6px);
-    box-shadow: var(--shadow-glow);
     border-color: transparent;
 }
 
 .project-card:hover::before {
     opacity: 1;
+}
+
+.project-card[data-accent]::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent);
+    opacity: 0;
+    transition: opacity var(--transition-smooth);
+}
+
+.project-card[data-accent]:hover::after {
+    opacity: 1;
+}
+
+.project-card[data-accent]:hover {
+    box-shadow: 0 8px 40px color-mix(in srgb, var(--card-accent) 20%, transparent);
 }
 
 .card-glow {
@@ -737,6 +898,17 @@ button:focus-visible {
     margin-top: 2rem;
 }
 
+.footer-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: var(--gradient-primary);
+    opacity: 0.4;
+}
+
 .footer-content {
     display: flex;
     flex-direction: column;
@@ -750,6 +922,28 @@ button:focus-visible {
 
 .copyright {
     font-size: 0.78rem;
+}
+
+.back-to-top {
+    position: relative;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-smooth);
+    margin-top: 0.5rem;
+}
+
+.back-to-top:hover {
+    color: var(--text-primary);
+    border-color: rgba(108, 92, 231, 0.4);
+    background: rgba(108, 92, 231, 0.08);
+    transform: translateY(-2px);
 }
 
 /* ──────────────────────────────────────────────

@@ -62,21 +62,24 @@ if (canvas) {
 
     function initParticles() {
         particles = [];
-        const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 15000));
+        const isMobile = window.innerWidth < 768;
+        const maxParticles = isMobile ? 30 : 60;
+        const count = Math.min(maxParticles, Math.floor((canvas.width * canvas.height) / 15000));
         for (let i = 0; i < count; i++) {
             particles.push(new Particle());
         }
     }
 
     function drawConnections() {
+        const connectionThreshold = window.innerWidth < 768 ? 80 : 100;
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist < 120) {
-                    const opacity = (1 - dist / 120) * 0.08;
+                if (dist < connectionThreshold) {
+                    const opacity = (1 - dist / connectionThreshold) * 0.06;
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
@@ -88,13 +91,22 @@ if (canvas) {
         }
     }
 
+    let isVisible = true;
+
+    const heroObserver = new IntersectionObserver((entries) => {
+        isVisible = entries[0].isIntersecting;
+    }, { threshold: 0 });
+    heroObserver.observe(document.querySelector('.hero'));
+
     function animateParticles() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach(p => {
-            p.update();
-            p.draw();
-        });
-        drawConnections();
+        if (isVisible) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            drawConnections();
+        }
         animationId = requestAnimationFrame(animateParticles);
     }
 
@@ -114,6 +126,19 @@ if (canvas) {
 }
 
 // ──────────────────────────────────────────────
+// Scroll Progress
+// ──────────────────────────────────────────────
+const scrollProgress = document.getElementById('scroll-progress');
+
+// ──────────────────────────────────────────────
+// Project Card Accent Colors
+// ──────────────────────────────────────────────
+document.querySelectorAll('.project-card[data-accent]').forEach(card => {
+    const accent = card.getAttribute('data-accent');
+    card.style.setProperty('--card-accent', accent);
+});
+
+// ──────────────────────────────────────────────
 // Navbar Scroll Effect
 // ──────────────────────────────────────────────
 const navbar = document.getElementById('navbar');
@@ -123,6 +148,15 @@ window.addEventListener('scroll', () => {
     if (!scrollTicking) {
         requestAnimationFrame(() => {
             navbar.classList.toggle('scrolled', window.scrollY > 50);
+
+            // Update scroll progress bar
+            if (scrollProgress) {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                scrollProgress.style.width = `${scrollPercent}%`;
+            }
+
             scrollTicking = false;
         });
         scrollTicking = true;
@@ -221,11 +255,11 @@ document.querySelectorAll('.fade-in').forEach(el => {
 // Typing Effect
 // ──────────────────────────────────────────────
 const phrases = [
-    'digital experiences that matter.',
-    'intuitive web applications.',
-    'encrypted social platforms.',
-    'fun side projects.',
-    'tools that empower people.'
+    'products that build connections.',
+    'tools that distill complexity into clarity.',
+    'systems that protect what matters.',
+    'games that bring people together.',
+    'experiences that feel effortless.'
 ];
 
 const typedElement = document.getElementById('typed-text');
@@ -279,3 +313,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+// ──────────────────────────────────────────────
+// Back to Top Button
+// ──────────────────────────────────────────────
+const backToTop = document.getElementById('back-to-top');
+
+if (backToTop) {
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}

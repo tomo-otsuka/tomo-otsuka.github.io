@@ -123,22 +123,69 @@ window.addEventListener('scroll', () => {
 });
 
 // ──────────────────────────────────────────────
-// Mobile Menu
+// Mobile Menu (with keyboard accessibility)
 // ──────────────────────────────────────────────
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('nav-links');
+const firstLink = navLinks.querySelector('a');
+const lastLink = navLinks.querySelectorAll('a').item(navLinks.querySelectorAll('a').length - 1);
+
+function openMenu() {
+    hamburger.classList.add('active');
+    navLinks.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    firstLink.focus();
+}
+
+function closeMenu() {
+    hamburger.classList.remove('active');
+    navLinks.classList.remove('active');
+    hamburger.setAttribute('aria-expanded', 'false');
+}
 
 hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navLinks.classList.toggle('active');
+    const isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+    if (isOpen) {
+        closeMenu();
+    } else {
+        openMenu();
+    }
 });
 
 // Close menu on link click
 navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navLinks.classList.remove('active');
+        closeMenu();
     });
+});
+
+// Close menu on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && hamburger.getAttribute('aria-expanded') === 'true') {
+        closeMenu();
+        hamburger.focus();
+    }
+});
+
+// Trap focus within mobile menu
+navLinks.addEventListener('keydown', (e) => {
+    if (hamburger.getAttribute('aria-expanded') !== 'true') return;
+
+    if (e.key === 'Tab') {
+        if (e.shiftKey) {
+            // Shift + Tab: if on first link, wrap to hamburger
+            if (document.activeElement === firstLink) {
+                e.preventDefault();
+                hamburger.focus();
+            }
+        } else {
+            // Tab: if on last link, wrap to hamburger
+            if (document.activeElement === lastLink) {
+                e.preventDefault();
+                hamburger.focus();
+            }
+        }
+    }
 });
 
 // ──────────────────────────────────────────────

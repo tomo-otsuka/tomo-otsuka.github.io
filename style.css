@@ -58,6 +58,26 @@ body {
     color: var(--text-primary);
 }
 
+/* Focus styles for keyboard navigation */
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--accent-3);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.nav-links a:focus-visible {
+    outline-offset: 4px;
+}
+
+.btn:focus-visible {
+    outline-offset: 4px;
+}
+
+.social-link:focus-visible {
+    outline-offset: 4px;
+}
+
 /* ──────────────────────────────────────────────
    Particle Canvas
    ────────────────────────────────────────────── */
